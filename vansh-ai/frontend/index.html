@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vansh AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e17;
+    --bg-panel:#10151f;
+    --bg-panel-2:#141a26;
+    --line:#212836;
+    --text:#e8ecf4;
+    --text-dim:#8891a3;
+    --cyan:#6ee7f9;
+    --violet:#a78bfa;
+    --amber:#f5b841;
+    --danger:#ef6a6a;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 700px at 15% -10%, rgba(110,231,249,0.10), transparent 60%),
+      radial-gradient(1000px 600px at 100% 10%, rgba(167,139,250,0.10), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    display:flex;
+    flex-direction:column;
+  }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:10px;
+    background:conic-gradient(from 220deg, var(--cyan), var(--violet), var(--amber), var(--cyan));
+  }
+  .brand-text{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; letter-spacing:0.2px;}
+  .brand-sub{font-size:12px; color:var(--text-dim); font-family:'JetBrains Mono',monospace;}
+  .conn{display:flex; align-items:center; gap:10px; font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--text-dim);}
+  .conn input{
+    background:var(--bg-panel-2); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:6px 10px; font-family:'JetBrains Mono',monospace; font-size:12px; width:190px;
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--danger); box-shadow:0 0 8px var(--danger);}
+  .dot.ok{background:#5fd68f; box-shadow:0 0 8px #5fd68f;}
+
+  main{
+    flex:1; display:grid; grid-template-columns: 1.05fr 1fr; gap:0;
+    min-height:0;
+  }
+  @media (max-width: 860px){ main{grid-template-columns:1fr;} }
+
+  /* ---------- Avatar stage ---------- */
+  .stage{
+    position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px; border-right:1px solid var(--line); min-height:0;
+  }
+  .ring-wrap{position:relative; width:min(360px, 70vw); aspect-ratio:1/1;}
+  .ring{
+    position:absolute; inset:0; border-radius:50%;
+    padding:3px;
+    background:conic-gradient(from 0deg, var(--cyan), var(--violet), var(--amber), var(--cyan));
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    transition:filter .25s ease;
+    animation:spin 10s linear infinite;
+    opacity:0.9;
+  }
+  .ring.pulse{ filter:drop-shadow(0 0 24px currentColor); }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .face-card{
+    position:absolute; inset:14px; border-radius:50%;
+    background:radial-gradient(120% 120% at 30% 20%, #1a2233, #0c1019 70%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+  }
+  #face-svg{width:72%; height:72%;}
+  .status-line{
+    margin-top:22px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);
+    display:flex; align-items:center; gap:8px; min-height:20px;
+  }
+  .status-line .state{color:var(--cyan); font-weight:500;}
+  .mic-row{margin-top:26px; display:flex; align-items:center; gap:14px;}
+  .mic-btn{
+    width:64px; height:64px; border-radius:50%; border:1px solid var(--line);
+    background:var(--bg-panel-2); color:var(--text); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .mic-btn:hover{transform:scale(1.05);}
+  .mic-btn.live{background:linear-gradient(135deg, var(--cyan), var(--violet)); color:#0a0e17; box-shadow:0 0 22px rgba(110,231,249,0.5);}
+
+  /* ---------- Chat panel ---------- */
+  .chat{display:flex; flex-direction:column; min-height:0;}
+  .chat-header{
+    padding:16px 22px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .chat-header h2{font-family:'Space Grotesk',sans-serif; font-size:15px; margin:0; font-weight:600;}
+  .kb-pill{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim);
+    border:1px dashed var(--line); padding:5px 10px; border-radius:999px; cursor:pointer;
+  }
+  .kb-pill:hover{border-color:var(--cyan); color:var(--cyan);}
+  .messages{flex:1; overflow-y:auto; padding:22px; display:flex; flex-direction:column; gap:14px;}
+  .msg{max-width:82%; padding:12px 15px; border-radius:14px; line-height:1.5; font-size:14.5px;}
+  .msg.user{align-self:flex-end; background:linear-gradient(135deg, rgba(110,231,249,0.16), rgba(167,139,250,0.16)); border:1px solid var(--line);}
+  .msg.ai{align-self:flex-start; background:var(--bg-panel); border:1px solid var(--line);}
+  .msg .emo{display:block; margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.6px;}
+
+  .composer{border-top:1px solid var(--line); padding:16px 18px; display:flex; gap:10px; align-items:flex-end;}
+  .composer textarea{
+    flex:1; resize:none; background:var(--bg-panel-2); color:var(--text); border:1px solid var(--line);
+    border-radius:12px; padding:12px 14px; font-family:'Inter',sans-serif; font-size:14px; min-height:44px; max-height:120px;
+  }
+  .send-btn{
+    background:linear-gradient(135deg, var(--cyan), var(--violet)); border:none; color:#0a0e17;
+    font-weight:600; padding:12px 18px; border-radius:12px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+  }
+  .send-btn:disabled{opacity:0.5; cursor:not-allowed;}
+
+  .upload-modal{
+    position:fixed; inset:0; background:rgba(6,8,13,0.7); display:none; align-items:center; justify-content:center; z-index:20;
+  }
+  .upload-modal.open{display:flex;}
+  .upload-card{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; width:min(420px, 90vw);
+  }
+  .upload-card h3{font-family:'Space Grotesk',sans-serif; margin-top:0;}
+  .upload-card ul{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); padding-left:18px;}
+  .upload-card input[type=file]{width:100%; margin:14px 0; color:var(--text-dim); font-size:13px;}
+  .upload-actions{display:flex; justify-content:flex-end; gap:10px;}
+  .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--text); padding:9px 14px; border-radius:10px; cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div>
+      <div class="brand-text">Vansh AI</div>
+      <div class="brand-sub">by Vansh Sharma — say "Hey Vansh AI" anytime</div>
+    </div>
+  </div>
+  <div class="conn">
+    <span class="dot" id="conn-dot"></span>
+    <span id="conn-text">checking backend…</span>
+    <input id="backend-url" value="http://localhost:8000" spellcheck="false" />
+  </div>
+</div>
+
+<main>
+  <section class="stage">
+    <div class="ring-wrap">
+      <div class="ring" id="ring"></div>
+      <div class="face-card">
+        <svg id="face-svg" viewBox="0 0 200 200">
+          <ellipse cx="65" cy="88" rx="10" ry="12" fill="#e8ecf4" id="eye-l"/>
+          <ellipse cx="135" cy="88" rx="10" ry="12" fill="#e8ecf4" id="eye-r"/>
+          <line x1="50" y1="66" x2="80" y2="66" stroke="#e8ecf4" stroke-width="5" stroke-linecap="round" id="brow-l"/>
+          <line x1="120" y1="66" x2="150" y2="66" stroke="#e8ecf4" stroke-width="5" stroke-linecap="round" id="brow-r"/>
+          <path id="mouth" d="M 75 135 Q 100 145 125 135" stroke="#e8ecf4" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="status-line">
+      <span>state:</span><span class="state" id="state-label">idle</span>
+    </div>
+    <div class="mic-row">
+      <button class="mic-btn" id="mic-btn" title='Say "Hey Vansh AI" or tap to talk'>🎤</button>
+    </div>
+    <div class="status-line" style="margin-top:8px; font-size:11px; opacity:0.7;">
+      language is detected automatically — just speak naturally
+    </div>
+  </section>
+
+  <section class="chat">
+    <div class="chat-header">
+      <h2>Conversation</h2>
+      <div class="kb-pill" id="kb-pill">📄 knowledge base: 0 chunks — click to add docs</div>
+    </div>
+    <div class="messages" id="messages">
+      <div class="msg ai">Hi, I'm Vansh AI, built by Vansh Sharma. Say "Hey Vansh AI" anytime to start talking hands-free, tap the mic, or just type below — I'll answer, speak back, and my face will react to what we're talking about.</div>
+    </div>
+    <div class="composer">
+      <textarea id="input" placeholder="Ask me anything…" rows="1"></textarea>
+      <button class="send-btn" id="send-btn">Send</button>
+    </div>
+  </section>
+</main>
+
+<div class="upload-modal" id="upload-modal">
+  <div class="upload-card">
+    <h3>Add knowledge (RAG)</h3>
+    <p style="color:var(--text-dim); font-size:13px;">Upload a .txt, .md, or .pdf file. Vansh AI will pull relevant passages into its answers — a miniature version of a RAG pipeline.</p>
+    <input type="file" id="file-input" accept=".txt,.md,.pdf" />
+    <ul id="kb-list"></ul>
+    <div class="upload-actions">
+      <button class="btn-ghost" id="upload-close">Close</button>
+      <button class="send-btn" id="upload-go">Upload</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+// If the page is opened with ?backend=https://your-backend-url, use that automatically —
+// this is what makes a single shareable live link "just work" once deployed.
+const urlParams = new URLSearchParams(window.location.search);
+const backendParam = urlParams.get('backend');
+if(backendParam){ $('backend-url').value = backendParam; }
+
+let backendUrl = $('backend-url').value.replace(/\/$/, '');
+let sessionId = null;           // kept in memory only — no browser storage
+let recognition = null;         // whichever SpeechRecognition instance is currently active
+let convMode = false;           // true while in an active hands-free back-and-forth
+let wakeDesired = true;         // whether we should keep listening for "Hey Vansh AI" when idle
+let lastDetectedLang = 'en-IN'; // auto-detected from the AI's own reply text
+let audioCtx = null, analyser = null, rafId = null;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const WAKE_RE = /(hey\s+)?vansh(\s*a\.?\s*i\.?)?/i;
+
+const EMOTION_STYLE = {
+  happy:       { color:'#f5b841', browTilt:-8,  mouthCurve:14, label:'happy' },
+  neutral:     { color:'#6ee7f9', browTilt:0,   mouthCurve:6,  label:'neutral' },
+  concerned:   { color:'#8ab4f8', browTilt:10,  mouthCurve:-4, label:'concerned' },
+  excited:     { color:'#ff8fd6', browTilt:-12, mouthCurve:18, label:'excited' },
+  empathetic:  { color:'#a78bfa', browTilt:4,   mouthCurve:4,  label:'empathetic' },
+  serious:     { color:'#7f8ba3', browTilt:6,   mouthCurve:-2, label:'serious' },
+  encouraging: { color:'#5fd68f', browTilt:-6,  mouthCurve:12, label:'encouraging' },
+};
+
+function setState(label){ $('state-label').textContent = label; }
+
+function applyEmotion(emotion){
+  const s = EMOTION_STYLE[emotion] || EMOTION_STYLE.neutral;
+  $('ring').style.color = s.color;
+  $('brow-l').setAttribute('transform', `rotate(${s.browTilt} 65 66)`);
+  $('brow-r').setAttribute('transform', `rotate(${-s.browTilt} 135 66)`);
+  setMouthOpenness(0, s.mouthCurve);
+}
+
+function setMouthOpenness(openness, restCurve=6){
+  // openness 0..1 drives how wide the mouth path opens (crude but effective viseme)
+  const curve = restCurve + openness * 26;
+  const drop = openness * 22;
+  $('mouth').setAttribute('d', `M 75 135 Q 100 ${145 + drop + curve/3} 125 135`);
+}
+
+function blinkLoop(){
+  const blink = () => {
+    $('eye-l').setAttribute('ry', 1.5); $('eye-r').setAttribute('ry', 1.5);
+    setTimeout(() => { $('eye-l').setAttribute('ry', 12); $('eye-r').setAttribute('ry', 12); }, 140);
+  };
+  setInterval(blink, 3200 + Math.random()*2000);
+}
+blinkLoop();
+
+function detectLangCode(text){
+  if(/[\u0900-\u097F]/.test(text)) return 'hi-IN';   // Devanagari — Hindi/Marathi
+  if(/[\u0980-\u09FF]/.test(text)) return 'bn-IN';   // Bengali
+  if(/[\u0A80-\u0AFF]/.test(text)) return 'gu-IN';   // Gujarati
+  if(/[\u0B80-\u0BFF]/.test(text)) return 'ta-IN';   // Tamil
+  if(/[\u0C00-\u0C7F]/.test(text)) return 'te-IN';   // Telugu
+  return 'en-IN';
+}
+
+/* ---------------- backend health ---------------- */
+async function checkBackend(){
+  try{
+    const r = await fetch(`${backendUrl}/api/health`);
+    const data = await r.json();
+    $('conn-dot').classList.add('ok');
+    $('conn-text').textContent = data.gemini_configured ? 'backend connected' : 'backend up, missing GEMINI_API_KEY';
+    $('kb-pill').textContent = `📄 knowledge base: ${data.rag_chunks_indexed} chunks — click to add docs`;
+  }catch(e){
+    $('conn-dot').classList.remove('ok');
+    $('conn-text').textContent = 'backend not reachable — run the FastAPI server (see README)';
+  }
+}
+$('backend-url').addEventListener('change', (e) => { backendUrl = e.target.value.replace(/\/$/, ''); checkBackend(); });
+checkBackend();
+setInterval(checkBackend, 8000);
+
+/* ---------------- chat ---------------- */
+function addMessage(text, who, emotion){
+  const div = document.createElement('div');
+  div.className = `msg ${who}`;
+  div.textContent = text;
+  if(emotion){
+    const tag = document.createElement('span');
+    tag.className = 'emo'; tag.textContent = emotion;
+    div.appendChild(tag);
+  }
+  $('messages').appendChild(div);
+  $('messages').scrollTop = $('messages').scrollHeight;
+}
+
+async function sendMessage(text){
+  if(!text.trim()) return;
+  stopRecognition();
+  $('mic-btn').classList.remove('live');
+  addMessage(text, 'user');
+  $('input').value = '';
+  setState('thinking…');
+  $('send-btn').disabled = true;
+
+  try{
+    const r = await fetch(`${backendUrl}/api/chat`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message:text, session_id: sessionId })
+    });
+    if(!r.ok){ throw new Error((await r.json()).detail || r.statusText); }
+    const data = await r.json();
+    sessionId = data.session_id;
+    addMessage(data.reply, 'ai', data.emotion);
+    applyEmotion(data.emotion);
+    await speak(data.reply);
+  }catch(err){
+    addMessage(`⚠️ ${err.message}`, 'ai', 'concerned');
+    applyEmotion('concerned');
+    if(convMode){ listenForCommand(); }
+    else if(wakeDesired){ startWakeListening(); }
+    else{ setState('idle'); }
+  }finally{
+    $('send-btn').disabled = false;
+  }
+}
+
+$('send-btn').addEventListener('click', () => sendMessage($('input').value));
+$('input').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage($('input').value); }
+});
+
+/* ---------------- speech output (ElevenLabs -> amplitude lip-sync, else free browser TTS) ---------------- */
+async function speak(text){
+  setState('speaking…');
+  $('ring').classList.add('pulse');
+  lastDetectedLang = detectLangCode(text);
+  try{
+    const r = await fetch(`${backendUrl}/api/speak`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text })
+    });
+    if(r.status === 204){
+      await speakBrowserTTS(text);
+      return;
+    }
+    const blob = await r.blob();
+    await speakWithAmplitudeLipSync(blob);
+  }catch(e){
+    await speakBrowserTTS(text); // graceful fallback if ElevenLabs call fails
+  }finally{
+    $('ring').classList.remove('pulse');
+    setMouthOpenness(0);
+    // Auto-resume listening — this is what makes a real conversation possible
+    // without re-clicking the mic after every single reply.
+    if(convMode){ listenForCommand(); }
+    else if(wakeDesired){ startWakeListening(); }
+    else{ setState('idle'); }
+  }
+}
+
+function speakWithAmplitudeLipSync(blob){
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(blob);
+    const audioEl = new Audio(url);
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaElementSource(audioEl);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+
+    const tick = () => {
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((a,b)=>a+b,0) / data.length;
+      setMouthOpenness(Math.min(avg / 90, 1));
+      rafId = requestAnimationFrame(tick);
+    };
+    audioEl.onplay = () => { tick(); };
+    audioEl.onended = () => { cancelAnimationFrame(rafId); URL.revokeObjectURL(url); resolve(); };
+    audioEl.onerror = () => { cancelAnimationFrame(rafId); resolve(); };
+    audioEl.play();
+  });
+}
+
+function speakBrowserTTS(text){
+  return new Promise((resolve) => {
+    if(!('speechSynthesis' in window)){ resolve(); return; }
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = lastDetectedLang;
+    utter.onboundary = () => {
+      // crude word-level viseme pulse — no true amplitude data available from SpeechSynthesis
+      setMouthOpenness(0.6 + Math.random()*0.4);
+      setTimeout(() => setMouthOpenness(0.15), 90);
+    };
+    utter.onend = resolve;
+    utter.onerror = resolve;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  });
+}
+
+/* ---------------- speech input: wake-word + hands-free conversation loop ---------------- */
+function stopRecognition(){
+  if(recognition){
+    try{
+      recognition.onresult = null; recognition.onerror = null; recognition.onend = null;
+      recognition.abort();
+    }catch(e){}
+    recognition = null;
+  }
+}
+
+function startWakeListening(){
+  if(!SR){ setState('voice needs Chrome or Edge'); return; }
+  if(convMode) return; // never run wake-word detection while a conversation is active
+  stopRecognition();
+  setState('waiting for "Hey Vansh AI"…');
+  const rec = new SR();
+  recognition = rec;
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.lang = 'en-IN'; // handles "hey vansh ai" reliably; the actual question can be any language
+  rec.onresult = (e) => {
+    const last = e.results[e.results.length - 1];
+    const transcript = last[0].transcript;
+    const match = transcript.match(WAKE_RE);
+    if(match){
+      const remainder = transcript.slice(match.index + match[0].length).trim();
+      enterConversation(remainder);
+    }
+  };
+  rec.onerror = (e) => {
+    if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
+      setState('tap anywhere to enable voice');
+      const enableOnce = () => { document.removeEventListener('click', enableOnce); startWakeListening(); };
+      document.addEventListener('click', enableOnce, { once:true });
+      return;
+    }
+    if(wakeDesired && !convMode) setTimeout(startWakeListening, 500);
+  };
+  rec.onend = () => {
+    if(wakeDesired && !convMode && recognition === rec){ recognition = null; setTimeout(startWakeListening, 250); }
+  };
+  try{ rec.start(); }catch(e){ /* already running — ignore */ }
+}
+
+function enterConversation(initialText){
+  convMode = true;
+  stopRecognition();
+  $('mic-btn').classList.add('live');
+  if(initialText && initialText.length > 2){
+    sendMessage(initialText); // wake phrase + question said in one breath
+  }else{
+    listenForCommand();
+  }
+}
+
+function listenForCommand(){
+  if(!SR) return;
+  stopRecognition();
+  setState('listening…');
+  $('mic-btn').classList.add('live');
+  const rec = new SR();
+  recognition = rec;
+  rec.continuous = false;
+  rec.interimResults = false;
+  rec.lang = lastDetectedLang;
+  rec.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    sendMessage(transcript); // sendMessage -> speak() will resume listening afterward
+  };
+  rec.onerror = (e) => {
+    // silence / no-speech after a reply means the student is done for now — go back to sleep,
+    // still reachable instantly by saying "Hey Vansh AI" again
+    if(convMode) exitConversation();
+  };
+  rec.onend = () => {
+    // if this instance is still the active one, no result/error fired (e.g. silent timeout) —
+    // treat it the same as "student is done for now"
+    if(convMode && recognition === rec) exitConversation();
+  };
+  try{ rec.start(); }catch(e){}
+}
+
+function exitConversation(){
+  convMode = false;
+  stopRecognition();
+  $('mic-btn').classList.remove('live');
+  if(wakeDesired) startWakeListening(); else setState('idle');
+}
+
+$('mic-btn').addEventListener('click', () => {
+  if(convMode){
+    exitConversation();
+  }else{
+    enterConversation('');
+  }
+});
+
+/* ---------------- RAG upload modal ---------------- */
+$('kb-pill').addEventListener('click', async () => {
+  $('upload-modal').classList.add('open');
+  try{
+    const r = await fetch(`${backendUrl}/api/knowledge`);
+    const data = await r.json();
+    $('kb-list').innerHTML = data.sources.length
+      ? data.sources.map(s => `<li>${s}</li>`).join('')
+      : '<li>nothing indexed yet</li>';
+  }catch(e){ $('kb-list').innerHTML = '<li>backend not reachable</li>'; }
+});
+$('upload-close').addEventListener('click', () => $('upload-modal').classList.remove('open'));
+$('upload-go').addEventListener('click', async () => {
+  const file = $('file-input').files[0];
+  if(!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+  $('upload-go').disabled = true;
+  try{
+    const r = await fetch(`${backendUrl}/api/upload`, { method:'POST', body: fd });
+    if(!r.ok) throw new Error((await r.json()).detail || 'upload failed');
+    await checkBackend();
+    $('upload-modal').classList.remove('open');
+  }catch(e){ alert(e.message); }
+  finally{ $('upload-go').disabled = false; }
+});
+
+applyEmotion('neutral');
+startWakeListening();
+</script>
+</body>
+</html>
