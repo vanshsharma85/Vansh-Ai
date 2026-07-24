@@ -1,7 +1,8 @@
 # Vansh AI 🎙️
 
 **A human-like, hands-free AI voice avatar — built by [Vansh Sharma](https://github.com/).**
-For Live https://vansh-ai.netlify.app/?backend=https://vansh-ai.onrender.com
+## For Live 
+https://vansh-ai.netlify.app/?backend=https://vansh-ai.onrender.com
 
 Say *"Hey Vansh AI"* and just start talking. It listens, thinks, replies out loud, and its
 animated face reacts with expression and lip-sync — in whatever language you speak to it in.
