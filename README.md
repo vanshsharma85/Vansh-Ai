@@ -26,7 +26,7 @@ animated face reacts with expression and lip-sync — in whatever language you s
 
 ## 🎬 Demo
 
-![Demo](Login_page.jpg)
+![Demo](Demo.jpg)
 
 ## 🧱 Tech Stack
 
