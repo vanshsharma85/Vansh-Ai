@@ -26,7 +26,7 @@ animated face reacts with expression and lip-sync — in whatever language you s
 
 ## 🎬 Demo
 
-![Demo](Demo.jpg)
+![Demo](vansh-ai/Demo.jpg)
 
 ## 🧱 Tech Stack
 
