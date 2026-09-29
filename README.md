@@ -26,8 +26,7 @@ animated face reacts with expression and lip-sync — in whatever language you s
 
 ## 🎬 Demo
 
-> _Add a screenshot or short screen-recording GIF of the app here once you've got it running —
-> it makes a huge difference on GitHub._
+![Demo](Login_page.jpg)
 
 ## 🧱 Tech Stack
 
